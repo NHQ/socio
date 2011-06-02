@@ -1,0 +1,25 @@
+h1.editable= title
+p Welcome to #{title}
+h3 Name
+h3 Address
+h3 Description
+h3 Architect/Builder
+h3 Neighborhood
+h3 List Price
+h3 Contact
+h3 Zoning
+h3 Taxes
+h3 Year Built
+h3 Floor Plane
+h3 Pictures (General)
+h3 Rooms/Sections
+
+script(type='text/javascript')
+  $('.editable').aloha();
+  $('.editable').focusout(function(e){
+  var content = "";
+  jQuery.each(GENTICS.Aloha.editables,function (index, editable) {
+  content = editable.getContents();
+  });
+  alert(content);
+  })
