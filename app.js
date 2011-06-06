@@ -1,4 +1,7 @@
-
+/**
+ * NOTES
+	* Possible idea for other Sabina website: property picks a la blog
+*/
 /**
  * Module dependencies.
  */
@@ -6,6 +9,7 @@
 var express = require('express'),
 	mongoose = require('mongoose');	
 	mongoose.connect('mongodb://localhost/test');
+var _ = require('underscore');
 
 var app = module.exports = express.createServer();
 
@@ -67,6 +71,13 @@ function newDoc (){
 	})
 }
 
+app.get('/admin', function(req, res){
+	newDoc();
+  res.render('index', {
+    title: 'Admin'
+  });
+});
+
 app.get('/', function(req, res){
 	newDoc();
   res.render('index', {
@@ -76,3 +87,4 @@ app.get('/', function(req, res){
 
 app.listen(3000);
 console.log("Express server listening on port %d", app.address().port);
+console.log(_.keys(building.paths));
