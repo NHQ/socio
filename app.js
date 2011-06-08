@@ -9,7 +9,8 @@
 var express = require('express'),
 	mongoose = require('mongoose');	
 	mongoose.connect('mongodb://localhost/test');
-var _ = require('underscore');
+var _ = require('underscore')
+	, request = require('request');
 
 var app = module.exports = express.createServer();
 
@@ -38,6 +39,7 @@ var Images = new schema({
 	title: String,
 	desscription: String,
 	filepath: String, 
+	thumb: String
 });
 var building = new schema({
 	name: String,
@@ -61,25 +63,54 @@ mongoose.model('building', building);
 
 // Routes
 
-function newDoc (){
+function getDoc(_id){
 	var building = mongoose.model('building');
-	var doc = new building();
-	doc.name = "First Name"
-	doc.save(function(err, doc){
-		if(err){console.log(err)}
-		if(doc)console.log(doc)
+	doc = building.findById(_id, function (err, doc){
+		if(!err) return doc
 	})
 }
 
+function newDoc (){
+	var building = mongoose.model('building');
+	doc = new building();
+	doc.name = "New Building"
+	doc.save(function(err, doc){
+		if(err){console.log(err)}
+		if(doc)
+		{
+			console.log(doc._id);
+		}
+	})
+}
+
+app.post('/uploads', function (req, res){
+	res.writeHead('200');
+	var _id = req.query._id;
+	getDoc(_id);
+	var info = JSON.parse(req.body);
+	request('')
+	
+})
+
 app.get('/admin', function(req, res){
-	newDoc();
-  res.render('index', {
-    title: 'Admin'
+	newDoc()
+  	res.render('index', {locals:
+    	{
+			title: 'Admin',
+			doc: doc,
+			tranny: {
+	  			"auth": 
+				{
+	    			"key": "b2841a053d384302bf39b2ab4dbc88ec"
+	  			},
+	  			"template_id": "6f8d596087084fc18cfaa9924801e17c",
+	  			"redirect_url": "http://72.2.117.15/upload?_id="+doc._id
+			}
+		}
   });
 });
 
 app.get('/', function(req, res){
-	newDoc();
   res.render('index', {
     title: 'New Building'
   });

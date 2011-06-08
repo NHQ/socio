@@ -1,25 +1,31 @@
 h1.editable= title
 p Welcome to #{title}
-h3 Name
-h3 Address
-h3 Description
-h3 Architect/Builder
-h3 Neighborhood
-h3 List Price
-h3 Contact
-h3 Zoning
-h3 Taxes
-h3 Year Built
-h3 Floor Plane
-h3 Pictures (General)
-h3 Rooms/Sections
-
+ul
+  li Name
+  li Address
+  li Description
+  li Architect/Builder
+  li Neighborhood
+  li List Price
+  li Contact
+  li Zoning
+  li Taxes
+  li Year Built
+  li Floor Plane
+  li Pictures (General)
+  li Rooms/Sections
+form(id="MyForm", action="http://api2.transloadit.com/assemblies", enctype="multipart/form-data", method="POST")
+  input(type="hidden", name="_id", value= doc._id)
+  input(type="hidden", name="params", value= escape(JSON.stringify(tranny)))
+  input(type="file", name="my_file")
+  input(type="submit", value="Upload")
+ 
 script(type='text/javascript')
   $('.editable').aloha();
-  $('.editable').focusout(function(e){
-  var content = "";
-  jQuery.each(GENTICS.Aloha.editables,function (index, editable) {
-  content = editable.getContents();
+  $(document).ready(function(){
+    $('#MyForm').transloadit({
+      wait: true,
+      autoSubmit: false,
+      fields: '#_id'
+    });
   });
-  alert(content);
-  })
