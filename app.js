@@ -64,9 +64,10 @@ mongoose.model('building', building);
 
 // Routes
 function saveDoc(_id, keys){
-	// keys is an array
+	// keys is an obj
 	var building - mongoose.model('building');
-	building.findById(_id, function (err, res, doc){
+	building.update({_id: _id}, keys, function (err, res, doc){
+		doc.
 	})
 }
 function getDoc(_id){
