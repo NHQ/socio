@@ -10,7 +10,8 @@ var express = require('express'),
 	mongoose = require('mongoose');	
 	mongoose.connect('mongodb://localhost/test');
 var _ = require('underscore')
-	, request = require('request');
+	, request = require('request')
+	, fs = require('fs');
 
 var app = module.exports = express.createServer();
 
@@ -62,7 +63,12 @@ mongoose.model('Images', Images);
 mongoose.model('building', building);
 
 // Routes
-
+function saveDoc(_id, keys){
+	// keys is an array
+	var building - mongoose.model('building');
+	building.findById(_id, function (err, res, doc){
+	})
+}
 function getDoc(_id){
 	var building = mongoose.model('building');
 	doc = building.findById(_id, function (err, doc){
@@ -87,8 +93,20 @@ app.post('/uploads', function (req, res){
 	res.writeHead('200');
 	var _id = req.query._id;
 	getDoc(_id);
-	var info = JSON.parse(req.body);
-	request('')
+	var info = req.body;
+	console.log(info);
+	request({
+		uri: info.uploads.ur		
+	}, function(err, res, body){
+		 if (!error && response.statusCode == 200)
+		{
+			fs.writeFile(info.uploads.name, body, function (err){
+				if(err)
+				console.log(err);
+				else console.log('saved')
+			})
+		}
+	})
 	
 })
 
