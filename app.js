@@ -63,19 +63,34 @@ mongoose.model('Images', Images);
 mongoose.model('building', building);
 
 // Routes
-function saveDoc(_id, keys){
+function upDoc(_id, keys){
 	// keys is an obj
 	var building = mongoose.model('building');
 	building.update({_id: _id}, keys, function (err, res, doc){
+		console.log(err);
+		console.log(res);
+		console.log(doc)
 	})
 }
 function getDoc(_id){
 	var building = mongoose.model('building');
 	doc = building.findById(_id, function (err, doc){
-		if(!err) return doc
+		console.log(doc);
+		if(!err) return doc;
 	})
 }
-
+function newImg (){
+	var image = mongoose.model('Images');
+	doc = new image();
+	doc.name = "New image"
+	doc.save(function(err, doc){
+		if(err){console.log(err)}
+		if(doc)
+		{
+			console.log(doc._id);
+		}
+	})
+}
 function newDoc (){
 	var building = mongoose.model('building');
 	doc = new building();
@@ -92,20 +107,20 @@ function newDoc (){
 app.post('/uploads', function (req, res){
 	res.writeHead('200');
 	var _id = req.query._id;
-	getDoc(_id);
 	var info = req.body;
 	console.log(info);
-	request({
-		uri: info.uploads.ur		
-	}, function(err, res, body){
-		 if (!error && response.statusCode == 200)
+	
+	request({uri: info.uploads.url}, function(err, res, body){
+		if (!error && response.statusCode == 200)
 		{
-			fs.writeFile(info.uploads.name, body, function (err){
-				if(err)
-				console.log(err);
-				else console.log('saved')
+			fs.writeFile('public/images'+info.uploads.name, body, function (err){
+				if(!err)
+				{
+					console.log('saved')
+					upDoc(_id, {pictures:{'title':'plume'}})
+				}
 			})
-		}
+	    }
 	})
 	
 })
@@ -129,11 +144,12 @@ app.get('/admin', function(req, res){
 });
 
 app.get('/', function(req, res){
-  res.render('index', {
-    title: 'New Building'
+  res.render('front', {
+    title: 'Welcome'
   });
 });
 
 app.listen(3000);
 console.log("Express server listening on port %d", app.address().port);
 console.log(_.keys(building.paths));
+newImg();
