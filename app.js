@@ -199,7 +199,7 @@ app.get('/admin', newDoc, function(req, res){
 	  			},
 	  			"template_id": "6f8d596087084fc18cfaa9924801e17c",
 	  			"redirect_url": "http://72.2.117.15/admin",
-				"notify_url": "http://72.2.117.15/upload?_id="+req.facts._id+"&type=Images"
+				"notify_url": "http://72.2.117.15/"
 			}
 		}
   });
