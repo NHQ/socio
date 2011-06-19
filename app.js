@@ -178,7 +178,7 @@ function newDoc (req, res, next){
 	})
 }
 
-app.post('/uploads', function (req, res){
+app.post('/upload', function (req, res){
 	res.writeHead('200');
 	var _id = req.query._id;
 	var info = req.body;
