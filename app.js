@@ -180,7 +180,7 @@ function newDoc (req, res, next){
 
 app.post('/upload', function (req, res){
 	res.writeHead('200');
-	var _id = req.query._id;
+	res.end();
 	var info = req.body;
 	console.log(req.headers);
 	console.log(info);
