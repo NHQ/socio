@@ -21,6 +21,7 @@ app.configure(function(){
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
   app.use(express.bodyParser());
+  app.use(express.logger({ format: '\x1b[1m:method\x1b[0m \x1b[33m:url\x1b[0m :response-time ms' }));
   app.use(express.methodOverride());
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
@@ -35,34 +36,86 @@ app.configure('production', function(){
 });
 
 // Models
-var schema = mongoose.Schema;
-var Images = new schema({
+var Schema = mongoose.Schema;
+var Links = new Schema({
+	test: String,
+	media: Array,
+	href: String
+})
+var Menu = new Schema({
 	title: String,
-	desscription: String,
-	filepath: String, 
-	thumb: String
+	media: {_id: String, elements: Array}, //each array item is an element object
+	link: [Links]
+})
+var People = new Schema({
+	fname: String,
+	mname: String,
+	lname: String,
+	gender: String,
+	location: String,
+	articles: Array,
+	fb_id: String,
+	access_token: String,
+	bio: String
 });
-var building = new schema({
-	name: String,
-	address: String,
-	description: String,
-	year_built: Number,
-	architect: String,
-	zoning: String,
-	neighborhood: String,
-	list_price: Number,
-	taxes: String,
-	contact: String,
-	owner: String,
-	floor_plan: {description: String, pictures: [Images]}, 
-	pictures: [Images],
-	sections: {name: String, description: String, pictures: [Images]}	
+var Media = new Schema({
+	title: String,
+	doc_type: String,
+	caption: String,
+	authors: [People],
+	meta: String, //json
+	path: String, 
+	thumb: String, 
+	medium: String,
+	description: String, 
+	copyright: String,
+	pub_date: Date,
+	last_edit: Date
 });
 
-mongoose.model('Images', Images);
-mongoose.model('building', building);
+var Discussion = new Schema({
+	title: String,
+	author: [People],
+	text: String,
+	media: Array,
+	discussion: [Discussion],
+	pub_date: Date,
+	last_edit: Date
+});
+var Article = new Schema({
+	title: String,
+	subTitle: String,
+	slug: String,
+	publisher: String,
+	contributors: [People],
+	last_edit: Date,
+	pub_date: Date,
+	lingos: String,
+	volume: String,
+	issue: Number,
+	blurb: String,
+	contact: String,
+	//geo: { loc : { long : x, lat: y } },
+	geo_name: String,
+	channels: Array,
+	subjects: Array,
+	text: String,
+	media: Array,
+	discussion: [Discussion],
+	template: String,
+	theme: String,
+	//css:[CSS]
+});
+
+mongoose.model('Article', Article);
+mongoose.model('Discussion', Discussion);
+mongoose.model('Media', Media);
+mongoose.model('People', People);
+mongoose.model('Menu', Menu);
+mongoose.model('Links', Links);
 
 // Routes
+/*
 function upDoc(_id, keys){
 	// keys is an obj
 	var building = mongoose.model('building');
@@ -103,26 +156,34 @@ function newDoc (){
 		}
 	})
 }
+*/
+function newMedia (doc_type, info){
+	var media = mongoose.model('Media');
+	var doc = new Media();
+	doc.doc_type = doc_type;
+	doc.meta = info.uploads.meta; //an object
+	doc.
+}
+function newDoc (type){
+	var media = mongoose.model('Article');
+	var doc = new media();
+	doc.save(function(err, doc){
+		if(err){console.log(err)}
+		if(doc)
+		{
+			console.log(doc._id);
+			return doc
+		}
+	})
+}
 
 app.post('/uploads', function (req, res){
 	res.writeHead('200');
 	var _id = req.query._id;
 	var info = req.body;
+	console.log(req.headers);
 	console.log(info);
-	
-	request({uri: info.uploads.url}, function(err, res, body){
-		if (!error && response.statusCode == 200)
-		{
-			fs.writeFile('public/images'+info.uploads.name, body, function (err){
-				if(!err)
-				{
-					console.log('saved')
-					upDoc(_id, {pictures:{'title':'plume'}})
-				}
-			})
-	    }
-	})
-	
+
 })
 
 app.get('/admin', function(req, res){
@@ -137,7 +198,8 @@ app.get('/admin', function(req, res){
 	    			"key": "b2841a053d384302bf39b2ab4dbc88ec"
 	  			},
 	  			"template_id": "6f8d596087084fc18cfaa9924801e17c",
-	  			"redirect_url": "http://72.2.117.15/upload?_id="+doc._id
+	  			"redirect_url": "http://72.2.117.15/admin",
+				"notify_url": "http:72.2.117.15/upload?_id="+doc._id+"&type=Images"
 			}
 		}
   });
@@ -151,5 +213,3 @@ app.get('/', function(req, res){
 
 app.listen(3000);
 console.log("Express server listening on port %d", app.address().port);
-console.log(_.keys(building.paths));
-newImg();
