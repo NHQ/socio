@@ -162,8 +162,8 @@ function newMedia (doc_type, info){
 	var doc = new Media();
 	doc.doc_type = doc_type;
 	doc.meta = info.uploads.meta; //an object
-	doc.
 }
+
 function newDoc (type){
 	var media = mongoose.model('Article');
 	var doc = new media();
