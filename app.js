@@ -164,7 +164,7 @@ function newMedia (doc_type, info){
 	doc.meta = info.uploads.meta; //an object
 }
 
-function newDoc (type){
+function newDoc (req, res, next){
 	var media = mongoose.model('Article');
 	var doc = new media();
 	doc.save(function(err, doc){
@@ -172,7 +172,8 @@ function newDoc (type){
 		if(doc)
 		{
 			console.log(doc._id);
-			return doc
+			req.facts = doc;
+			next();
 		}
 	})
 }
@@ -186,12 +187,11 @@ app.post('/uploads', function (req, res){
 
 })
 
-app.get('/admin', function(req, res){
-	newDoc()
+app.get('/admin', newDoc, function(req, res){
   	res.render('index', {locals:
     	{
 			title: 'Admin',
-			doc: doc,
+			doc: req.facts,
 			tranny: {
 	  			"auth": 
 				{
@@ -199,7 +199,7 @@ app.get('/admin', function(req, res){
 	  			},
 	  			"template_id": "6f8d596087084fc18cfaa9924801e17c",
 	  			"redirect_url": "http://72.2.117.15/admin",
-				"notify_url": "http:72.2.117.15/upload?_id="+doc._id+"&type=Images"
+				"notify_url": "http:72.2.117.15/upload?_id="+req.facts._id+"&type=Images"
 			}
 		}
   });
