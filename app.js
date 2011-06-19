@@ -162,7 +162,7 @@ function newMedia (doc_type, info){
 	var doc = new Media();
 	doc.doc_type = doc_type;
 	doc.meta = info.uploads.meta; //an object
-}
+};
 
 function newDoc (req, res, next){
 	var media = mongoose.model('Article');
@@ -176,7 +176,7 @@ function newDoc (req, res, next){
 			next();
 		}
 	})
-}
+};
 
 app.post('/upload', function (req, res){
 	res.writeHead('200');
@@ -185,7 +185,7 @@ app.post('/upload', function (req, res){
 	console.log(req.headers);
 	console.log(info);
 
-})
+});
 
 app.get('/admin', newDoc, function(req, res){
   	res.render('index', {locals:
