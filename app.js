@@ -11,7 +11,11 @@ var express = require('express'),
 	mongoose.connect('mongodb://localhost/test');
 var _ = require('underscore')
 	, request = require('request')
-	, fs = require('fs');
+	, fs = require('fs')
+	, url = require('url')
+	, query = require('querystring')
+	, http = require('http')
+	, user= require('./user-model');
 
 var app = module.exports = express.createServer();
 
@@ -21,6 +25,7 @@ app.configure(function(){
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
   app.use(express.bodyParser());
+  app.use(express.cookieParser());
   app.use(express.logger({ format: '\x1b[1m:method\x1b[0m \x1b[33m:url\x1b[0m :response-time ms' }));
   app.use(express.methodOverride());
   app.use(app.router);
@@ -38,7 +43,7 @@ app.configure('production', function(){
 // Models
 var Schema = mongoose.Schema;
 var Links = new Schema({
-	test: String,
+	text: String,
 	media: Array,
 	href: String
 })
@@ -59,18 +64,30 @@ var People = new Schema({
 	bio: String
 });
 var Media = new Schema({
-	title: String,
-	doc_type: String,
-	caption: String,
-	authors: [People],
-	meta: String, //json
-	path: String, 
-	thumb: String, 
-	medium: String,
-	description: String, 
-	copyright: String,
-	pub_date: Date,
-	last_edit: Date
+	content:
+	{
+		title: String,
+		description: String, 
+		doc_type: String,
+		caption: String,
+		path: String, 
+		thumb: String, 
+		medium: String,
+	},
+	meta:
+	{
+		authors: [People],
+		meta: String, //json
+		copyright: String,
+		pub_date: Date,
+		last_edit: Date		
+	},
+	style:
+	{
+		template: String,
+		theme: String,
+		//css:[CSS]
+	},
 });
 
 var Discussion = new Schema({
@@ -83,28 +100,36 @@ var Discussion = new Schema({
 	last_edit: Date
 });
 var Article = new Schema({
-	title: String,
-	subTitle: String,
-	slug: String,
-	publisher: String,
-	contributors: [People],
-	last_edit: Date,
-	pub_date: Date,
-	lingos: String,
-	volume: String,
-	issue: Number,
-	blurb: String,
-	contact: String,
-	//geo: { loc : { long : x, lat: y } },
-	geo_name: String,
-	channels: Array,
-	subjects: Array,
-	text: String,
+	content: 
+	{
+		title: String,
+		subTitle: String,
+		blurb: String,
+		text: String,		
+	},
 	media: Array,
+	meta:
+	{
+		//geo: { loc : { long : x, lat: y } },
+		geo_name: String,		
+		last_edit: { type: Date, required: true, default: new Date() },
+		pub_date: Date,
+		volume: String,
+		issue: Number,
+		publisher: String,
+		contributors: [People],	
+		slug: String,
+		channels: Array,
+		subjects: Array,
+		contact: String,
+	},
+	style:
+	{
+		template: String,
+		theme: String,
+		//css:[CSS]
+	},
 	discussion: [Discussion],
-	template: String,
-	theme: String,
-	//css:[CSS]
 });
 
 mongoose.model('Article', Article);
@@ -157,6 +182,18 @@ function newDoc (){
 	})
 }
 */
+
+function upDoc(id, field, key, valu){
+	// keys is an obj
+	var article = mongoose.model('Article');
+	article.findById(id, function (err, doc){
+		doc[field][key] = valu;
+		doc.save(function (err, res){
+			console.log(err);
+			console.log(res)	
+		});
+	})
+}
 function newMedia (doc_type, info){
 	var media = mongoose.model('Media');
 	var doc = new Media();
@@ -178,6 +215,16 @@ function newDoc (req, res, next){
 	})
 };
 
+app.post('/update', function(req,res){
+	res.writeHead('200');
+	var _id = req.query._id
+	, key = req.query.key
+	, valu = req.query.valu
+	, field = req.query.field;
+	upDoc(_id, field, key, valu);
+		res.end();
+});
+
 app.post('/upload', function (req, res){
 	res.writeHead('200');
 	res.end();
@@ -188,10 +235,14 @@ app.post('/upload', function (req, res){
 });
 
 app.get('/admin', newDoc, function(req, res){
+	console.log(req.facts)
   	res.render('index', {locals:
     	{
 			title: 'Admin',
 			doc: req.facts,
+			content: _.keys(Article.tree.content),
+			meta: _.keys(Article.tree.meta),
+			media: Article.tree.media,
 			tranny: {
 	  			"auth": 
 				{
@@ -211,5 +262,7 @@ app.get('/', function(req, res){
   });
 });
 
-app.listen(80);
+app.listen(3000);
 console.log("Express server listening on port %d", app.address().port);
+//console.log(_.keys(Article.paths.meta))
+console.log(_.keys(Article.tree.content))

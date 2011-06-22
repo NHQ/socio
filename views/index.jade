@@ -1,30 +1,44 @@
-#page
-  h1.editable= title
-  p Welcome to #{title}
-  ul
-    li Name
-    li Address
-    li Description
-    li Architect/Builder
-    li Neighborhood
-    li List Price
-    li Contact
-    li Zoning
-    li Taxes
-    li Year Built
-    li Floor Plane
-    li Pictures (General)
-    li Rooms/Sections
-  form(id="MyForm", action="http://api2.transloadit.com/assemblies", enctype="multipart/form-data", method="POST")
-    input(type="hidden", name="_id", value= doc._id)
-    input(type="hidden", name="params", value= escape(JSON.stringify(tranny)))
-    input(type="file", name="my_file")
-    input(type="submit", value="Upload")
+h1.editable= title
+div(id="document", data-filter=doc._id)
+ul.menu
+  li.subMenu 
+    h2(class="picker", data-filter="content") Content
+    - for (aught in content)
+      ul.content
+        li(class="content")
+        h4(class="subMenuItem", data-filter=content[aught])=content[aught]
+  li.subMenu
+    h2(class="picker", data-filter="meta") Meta
+    - for (mm in meta)
+      ul.meta
+        li(class="meta")
+        h4(class="subMenuItem", data-filter=meta[mm])=meta[mm]    
+  li.subMenu
+    h2(class="picker", data-filter="media") Media
+    - for (m in media)
+      ul.media
+        li(class="media")
+        h4(class="subMenuItem", data-filter=media[m])=media[m]
+
+.content
+  - for (aught in content)
+    div(class='entry '+content[aught])
+      .label
+        h3=content[aught]
+      textarea(id=content[aught], data-class="content", class="editable", name=content[aught])
+
+.meta
+  - for (mm in meta)
+    div(class='entry '+meta[mm])
+      .label
+        h3=meta[mm]
+      textarea(id=meta[mm], data-class="meta", class="editable", name=meta[mm])
+
+
+form(id="MyForm", action="http://api2.transloadit.com/assemblies", enctype="multipart/form-data", method="POST")
+  input(type="hidden", name="_id", value= doc._id)
+  input(type="hidden", name="params", value= escape(JSON.stringify(tranny)))
+  input(type="file", name="my_file")
+  input(type="submit", value="Upload")
  
-script(type='text/javascript')
-  $(document).ready(function(){
-  $('#MyForm').transloadit({
-      wait: false,
-      fields: true
-    });
-  });
+script(type='text/javascript', src='js/omegawd.js')

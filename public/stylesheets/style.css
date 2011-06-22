@@ -1,13 +1,80 @@
+/* mostly all admin this 
+*/
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+	-webkit-margin-before:0;-webkit-margin-after:0webkit-margin-end:0webkit-margin-start:0;}
+ul{list-style-type:none}
 body {
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+	background-color:#ffcc99;
+	background-image: 	url(/images/pattern-6.gif),url(/images/new8.gif),url(/images/new1.gif);
+	width:960px;
+	background-size: auto;
+	margin:0 auto;
+  	font-family: 'Terminal Dosis Light', arial, serif;
 }
-
 a {
   color: #00B7FF;
 }
 
 #page {
-	width:900px;
+	width:960px;
 	height:1000px;
 	margin: 0 auto;
 }
+
+.menu {float:right;list-style-type:none}
+
+
+
+.entry{width:960px;margin:1em 0;}
+h1{margin:0;padding:0;color:#666}
+h2{font-size:23px}
+h3 {font-size:39px;text-align:right;margin-right:1ex;color:#666}
+h4{font-size:18px}
+input{}
+.label{position:absolute;width:125px;height:55px;border-right:1px solid #ccc;}
+textarea 
+{
+	vertical-align:bottom;
+	margin-left:145px;
+	font-family: 'Terminal Dosis Light', arial, serif; 
+	font-size:25px; 
+	height:35px; 
+	width: 640px;
+	max-width: 640px;
+	border:none;
+	border-bottom:1px solid #ccc;
+	border-radius:7px;
+	padding:1ex;
+}
+#title
+{
+	text-align:center;
+}
+#text 
+{
+	height:340px;
+	border:none;
+}
+div.meta{display:none}
+#subTitle {text-align:center}
+textarea:hover, textarea:focus {border:none;box-shadow: 0 0 5px brown; border-radius:7px;outline:none}
+li.meta, li.media {display:none}
+ul.meta, ul.media {display:none}
