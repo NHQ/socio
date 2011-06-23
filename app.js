@@ -15,7 +15,7 @@ var _ = require('underscore')
 	, url = require('url')
 	, query = require('querystring')
 	, http = require('http')
-	, user= require('./user-model');
+	, user = require('./user-model');
 
 var app = module.exports = express.createServer();
 
@@ -41,103 +41,7 @@ app.configure('production', function(){
 });
 
 // Models
-var Schema = mongoose.Schema;
-var Links = new Schema({
-	text: String,
-	media: Array,
-	href: String
-})
-var Menu = new Schema({
-	title: String,
-	media: {_id: String, elements: Array}, //each array item is an element object
-	link: [Links]
-})
-var Person = new Schema({
-	fname: String,
-	mname: String,
-	lname: String,
-	gender: String,
-	location: String,
-	articles: [Article],
-	fb_id: String,
-	access_token: String,
-	bio: String
-});
-var Media = new Schema({
-	content:
-	{
-		title: String,
-		description: String, 
-		doc_type: String,
-		caption: String,
-		path: String, 
-		thumb: String, 
-		medium: String,
-	},
-	meta:
-	{
-		authors: [Person],
-		meta: String, //json
-		copyright: String,
-		pub_date: Date,
-		last_edit: Date		
-	},
-	style:
-	{
-		template: String,
-		theme: String,
-		//css:[CSS]
-	},
-});
 
-var Discussion = new Schema({
-	title: String,
-	author: [Person],
-	text: String,
-	media: Array,
-	discussion: [Discussion],
-	pub_date: Date,
-	last_edit: Date
-});
-var Article = new Schema({
-	content: 
-	{
-		title: String,
-		subTitle: String,
-		blurb: String,
-		text: String,		
-	},
-	media: Array,
-	meta:
-	{
-		//geo: { loc : { long : x, lat: y } },
-		geo_name: String,		
-		last_edit: { type: Date, required: true, default: new Date() },
-		pub_date: Date,
-		volume: String,
-		issue: Number,
-		publisher: String,
-		contributors: [Person],	
-		slug: String,
-		channels: Array,
-		subjects: Array,
-		contact: String,
-	},
-	style:
-	{
-		template: String,
-		theme: String,
-		//css:[CSS]
-	},
-	discussion: [Discussion],
-});
-
-mongoose.model('Article', Article);
-mongoose.model('Discussion', Discussion);
-mongoose.model('Media', Media);
-mongoose.model('Person', Person);
-mongoose.model('Menu', Menu);
-mongoose.model('Links', Links);
 
 // Routes
 /*
@@ -276,4 +180,4 @@ app.get('/', function(req, res){
 
 app.listen(3000);
 console.log("Express server listening on port %d", app.address().port);
-console.log(_.keys(Article.tree.content));
+user.user("johnny@dog.copm", "candy")
