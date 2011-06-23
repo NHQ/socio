@@ -23,7 +23,7 @@ time, mark, audio, video {
 ul{list-style-type:none}
 body {
 	background-color:#ffcc99;
-	background-image: 	url(/images/pattern-6.gif),url(/images/new8.gif),url(/images/new1.gif);
+	background-image: url(/images/new8.gif),url(/images/new1.gif), url(/images/pattern-3.png);
 	width:960px;
 	background-size: auto;
 	margin:0 auto;

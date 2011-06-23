@@ -52,13 +52,13 @@ var Menu = new Schema({
 	media: {_id: String, elements: Array}, //each array item is an element object
 	link: [Links]
 })
-var People = new Schema({
+var Person = new Schema({
 	fname: String,
 	mname: String,
 	lname: String,
 	gender: String,
 	location: String,
-	articles: Array,
+	articles: [Article],
 	fb_id: String,
 	access_token: String,
 	bio: String
@@ -76,7 +76,7 @@ var Media = new Schema({
 	},
 	meta:
 	{
-		authors: [People],
+		authors: [Person],
 		meta: String, //json
 		copyright: String,
 		pub_date: Date,
@@ -92,7 +92,7 @@ var Media = new Schema({
 
 var Discussion = new Schema({
 	title: String,
-	author: [People],
+	author: [Person],
 	text: String,
 	media: Array,
 	discussion: [Discussion],
@@ -117,7 +117,7 @@ var Article = new Schema({
 		volume: String,
 		issue: Number,
 		publisher: String,
-		contributors: [People],	
+		contributors: [Person],	
 		slug: String,
 		channels: Array,
 		subjects: Array,
@@ -135,7 +135,7 @@ var Article = new Schema({
 mongoose.model('Article', Article);
 mongoose.model('Discussion', Discussion);
 mongoose.model('Media', Media);
-mongoose.model('People', People);
+mongoose.model('Person', Person);
 mongoose.model('Menu', Menu);
 mongoose.model('Links', Links);
 
@@ -214,7 +214,19 @@ function newDoc (req, res, next){
 		}
 	})
 };
-
+function newPerson (req, res, next){
+	var media = mongoose.model('Person');
+	var doc = new media();
+	doc.save(function(err, doc){
+		if(err){console.log(err)}
+		if(doc)
+		{
+			console.log(doc._id);
+			req.facts = doc;
+			next();
+		}
+	})
+};
 app.post('/update', function(req,res){
 	res.writeHead('200');
 	var _id = req.query._id
@@ -234,7 +246,7 @@ app.post('/upload', function (req, res){
 
 });
 
-app.get('/admin', newDoc, function(req, res){
+app.get('/admin', newPerson, function(req, res){
 	console.log(req.facts)
   	res.render('index', {locals:
     	{
@@ -264,5 +276,4 @@ app.get('/', function(req, res){
 
 app.listen(3000);
 console.log("Express server listening on port %d", app.address().port);
-//console.log(_.keys(Article.paths.meta))
-console.log(_.keys(Article.tree.content))
+console.log(_.keys(Article.tree.content));
