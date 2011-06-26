@@ -145,7 +145,7 @@ app.get('/fb', function (req, res) {
 });
 
 app.get('fb/auth', function (req, res) {
-  fb.getAccessToken('230413970320943', 'appSecret', req.param('code'), 'http://72.2.117.15/auth'}, function (error, access_token, refresh_token) {
+  fb.getAccessToken('230413970320943', 'appSecret', req.param('code'), 'http://72.2.117.15/auth', function (error, access_token, refresh_token) {
     res.render('client', {access_token: access_token, refresh_token: refresh_token});
   });
 });
