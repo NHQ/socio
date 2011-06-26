@@ -16,9 +16,9 @@ var _ = require('underscore')
 	, query = require('querystring')
 	, http = require('http')
 	, user = require('./user-model')
-	, redis = require('redis');
+	, redis = require('redis')
 //	, RedisStore = require('connect-redis')(express);
-//	, fb = require('facebook-js');
+, fb = require('facebook-js');
 
 var app = module.exports = express.createServer();
 
@@ -129,7 +129,7 @@ app.get('/admin', newPerson, function(req, res){
 		}
   });
 });
-/*
+
 app.get('/', function(req, res){
   res.render('front', {
     title: 'Welcome'
@@ -163,7 +163,7 @@ app.get('fb/messages', function (req, res) {
   var stream = fb.apiCall('GET', '/me/feed', {access_token: req.param('access_token'), message: req.param('message')});
   stream.pipe(fs.createWriteStream('backup_feed.txt'));
 });
-*/
+
 app.listen(3000);
 console.log("Express server listening on port %d", app.address().port);
 user.user("johnny@dog.copm", "candy")
