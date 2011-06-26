@@ -30,7 +30,7 @@ app.configure(function(){
   app.use(express.bodyParser());
   app.use(express.cookieParser());
   app.use(express.logger({ format: '\x1b[1m:method\x1b[0m \x1b[33m:url\x1b[0m :response-time ms' }));
-  app.use(express.session({ store: new RedisStore, secret: 'keyboard cat' });
+  app.use(express.session({ store: new RedisStore, secret: 'keyboard cat' }));
   app.use(express.methodOverride());
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
