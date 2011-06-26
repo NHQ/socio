@@ -15,7 +15,10 @@ var _ = require('underscore')
 	, url = require('url')
 	, query = require('querystring')
 	, http = require('http')
-	, user = require('./user-model');
+	, user = require('./user-model')
+	, redis = require('redis')
+	, RedisStore = require('connect-redis')(express)
+	, fb = require('facebook-js');
 
 var app = module.exports = express.createServer();
 
@@ -27,6 +30,7 @@ app.configure(function(){
   app.use(express.bodyParser());
   app.use(express.cookieParser());
   app.use(express.logger({ format: '\x1b[1m:method\x1b[0m \x1b[33m:url\x1b[0m :response-time ms' }));
+  app.use(express.session({key: 'k33k33', secret: 'superSecret!', cookie: {maxAge: 84400000}, store: new RedisStore}));
   app.use(express.methodOverride());
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
@@ -40,52 +44,6 @@ app.configure('production', function(){
   app.use(express.errorHandler()); 
 });
 
-// Models
-
-
-// Routes
-/*
-function upDoc(_id, keys){
-	// keys is an obj
-	var building = mongoose.model('building');
-	building.update({_id: _id}, keys, function (err, res, doc){
-		console.log(err);
-		console.log(res);
-		console.log(doc)
-	})
-}
-function getDoc(_id){
-	var building = mongoose.model('building');
-	doc = building.findById(_id, function (err, doc){
-		console.log(doc);
-		if(!err) return doc;
-	})
-}
-function newImg (){
-	var image = mongoose.model('Images');
-	doc = new image();
-	doc.name = "New image"
-	doc.save(function(err, doc){
-		if(err){console.log(err)}
-		if(doc)
-		{
-			console.log(doc._id);
-		}
-	})
-}
-function newDoc (){
-	var building = mongoose.model('building');
-	doc = new building();
-	doc.name = "New Building"
-	doc.save(function(err, doc){
-		if(err){console.log(err)}
-		if(doc)
-		{
-			console.log(doc._id);
-		}
-	})
-}
-*/
 
 function upDoc(id, field, key, valu){
 	// keys is an obj
@@ -178,6 +136,34 @@ app.get('/', function(req, res){
   });
 });
 
-app.listen(3000);
+app.get('/fb', function (req, res) {
+  res.redirect(fb.getAuthorizeUrl({
+    client_id: '230413970320943',
+    redirect_uri: 'http://72.2.117.15/auth',
+    scope: 'offline_access,publish_stream'
+  }));
+});
+
+app.get('fb/auth', function (req, res) {
+  fb.getAccessToken('230413970320943', 'appSecret', req.param('code'), 'http://72.2.117.15/auth'}, function (error, access_token, refresh_token) {
+    res.render('client', {access_token: access_token, refresh_token: refresh_token});
+  });
+});
+
+app.post('fb/message', function (req, res) {
+  fb.apiCall('POST', '/me/feed',
+    {access_token: req.param('access_token'), message: req.param('message')},
+    function (error, response, body) {
+      res.render('done', {body: body});
+    }
+  );
+});
+
+app.get('fb/messages', function (req, res) {
+  var stream = fb.apiCall('GET', '/me/feed', {access_token: req.param('access_token'), message: req.param('message')});
+  stream.pipe(fs.createWriteStream('backup_feed.txt'));
+});
+
+app.listen(80);
 console.log("Express server listening on port %d", app.address().port);
 user.user("johnny@dog.copm", "candy")
