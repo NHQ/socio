@@ -17,6 +17,7 @@ var _ = require('underscore')
 	, http = require('http')
 	, user = require('./user-model')
 	, redis = require('redis')
+	, MemoryStore = require('connect').session.MemoryStore 
 	,  crypto = require('crypto')
 //	, RedisStore = require('connect-redis')(express)
 	,  mongoStore = require('connect-mongodb')
@@ -32,7 +33,7 @@ app.configure(function(){
   app.set('view engine', 'jade');
   app.use(express.bodyParser());
   app.use(express.cookieParser());
-  app.use(express.session({secret:'wazooo'}));
+  app.use(express.session({secret:'wazooo', store:MemoryStore}));
   app.use(express.methodOverride());
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
