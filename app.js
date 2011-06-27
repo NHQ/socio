@@ -17,6 +17,7 @@ var _ = require('underscore')
 	, http = require('http')
 	, user = require('./user-model')
 	, redis = require('redis')
+	,  crypto = require('crypto')
 //	, RedisStore = require('connect-redis')(express)
 	,  mongoStore = require('connect-mongodb')
     , fb = require('facebook-js');
