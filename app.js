@@ -167,6 +167,6 @@ app.get('fb/messages', function (req, res) {
   stream.pipe(fs.createWriteStream('backup_feed.txt'));
 });
 
-app.listen(3000);
+app.listen(80);
 console.log("Express server listening on port %d", app.address().port);
 user.user("johnny@dog.copm", "candy")
