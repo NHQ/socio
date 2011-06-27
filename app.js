@@ -31,7 +31,7 @@ app.configure(function(){
   app.set('view engine', 'jade');
   app.use(express.bodyParser());
   app.use(express.cookieParser());
-  app.use(express.session({key: 'k33k33', secret: 'superSecret!', cookie: {maxAge: 60000 * 20}, store: new mongoStore({dbnae:'sessions', port:27017}) }));
+  app.use(express.session({key: 'k33k33', secret: 'superSecret!', cookie: {maxAge: 60000 * 20}, store: new mongoStore({dbname:'sessions', port:27017}) }));
   app.use(express.methodOverride());
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
