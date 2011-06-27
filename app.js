@@ -17,7 +17,8 @@ var _ = require('underscore')
 	, http = require('http')
 	, user = require('./user-model')
 	, redis = require('redis')
-	, RedisStore = require('connect-redis')(express)
+//	, RedisStore = require('connect-redis')(express)
+	,  mongoStore = require('connect-mongodb')
     , fb = require('facebook-js');
 
 var app = module.exports = express.createServer();
@@ -25,12 +26,12 @@ var app = module.exports = express.createServer();
 // Configuration
 
 app.configure(function(){
+  app.use(express.logger({ format: '\x1b[1m:method\x1b[0m \x1b[33m:url\x1b[0m :response-time ms' }));
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
-  //app.use(express.bodyParser());
+  app.use(express.bodyParser());
   app.use(express.cookieParser());
-  app.use(express.logger({ format: '\x1b[1m:method\x1b[0m \x1b[33m:url\x1b[0m :response-time ms' }));
-  app.use(express.session({ store: new RedisStore, secret: 'keyboard cat' }));
+  app.use(express.session({key: 'k33k33', secret: 'superSecret!', cookie: {maxAge: 60000 * 20}, store: new mongoStore({dbnae:'sessions'}) }));
   app.use(express.methodOverride());
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
