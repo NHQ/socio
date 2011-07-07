@@ -21,12 +21,20 @@ var crypto = require('crypto'),
 		mname: String,
 		lname: String,
 		gender: String,
+		age: Number,
 		location: String,
 		articles: [Article],
 		fb_id: String,
 		access_token: String,
 		bio: String,
-		salt: String
+		salt: String,
+		password: String,
+		connections: {fb: Array, tw: Array, Lk: Array},
+		portrait: String,
+		comments: [Article],
+		blurbi: Array,
+		blurbo: Array,
+		projects: [Article] 
 	});
 	var Media = new Schema({
 		content:
@@ -104,7 +112,9 @@ var crypto = require('crypto'),
 	mongoose.model('Menu', Menu);
 	mongoose.model('Links', Links);
 	
-exports.user = function (email, password){
+//	exports.Article = function(){var art = mongoose.model('Article');console.log(art);return new art();}
+	
+exports.user = function (email, password, res){
 	
 			authenticate = function(plaintext){
 				return encryptPassword(plaintext) === hashed_password;
@@ -134,9 +144,9 @@ exports.user = function (email, password){
 				newUser.is_admin = true;
 				newUser.is_verified = false;
 				newUser.save(function (err, person){
-					if (!err) console.log('new perseon += \n'+ person.email +'\n'+person._id)
+					if (!err) console.log('new perseon += \n'+ person.email +'\n'+person._id +'\n'+person.password);
 				})
 				//newU.hmset(id, 'email', email, 'password', hashed_password,'salt', salt, 'isAdmin', 1, 'id', id);
 			},
- mak()
+ mak();
 };

@@ -1,0 +1,10 @@
+h1= title
+h2 Create New User
+br
+br
+form(method = 'post', action = '/login')
+  span email :
+    input(type = 'text', name = 'email', id = 'email')
+  span password :
+    input(type = 'password', name = 'password', id = 'password')
+  input(type = 'submit', value = 'Send')

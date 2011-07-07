@@ -19,7 +19,7 @@ var _ = require('underscore')
 	, redis = require('redis')
 	, MemoryStore = require('connect').session.MemoryStore 
 	,  crypto = require('crypto')
-//	, RedisStore = require('connect-redis')(express)
+	, RedisStore = require('connect-redis')(express)
 	,  mongoStore = require('connect-mongodb')
     , fb = require('facebook-js');
 
@@ -33,7 +33,7 @@ app.configure(function(){
   app.set('view engine', 'jade');
   app.use(express.bodyParser());
   app.use(express.cookieParser());
-  app.use(express.session({secret:'wazooo', store:MemoryStore}));
+  app.use(express.session({key: 'k33k33', secret: 'superSecret!', cookie: {maxAge: 60000 * 20}, store: new RedisStore()}));
   app.use(express.methodOverride());
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
@@ -47,6 +47,17 @@ app.configure('production', function(){
   app.use(express.errorHandler()); 
 });
 
+function getSesh (req, res, next){
+	console.log(req.session.uid);
+	if(!req.session.uid)
+		res.redirect('/login');
+	if(req.session.uid)
+	{
+		console.log(req.session.uid);
+		req.facts = req.session.uid;
+		next();
+	}
+};
 
 function upDoc(id, field, key, valu){
 	// keys is an obj
@@ -112,14 +123,14 @@ app.post('/upload', function (req, res){
 });
 
 app.get('/admin', newPerson, function(req, res){
-	console.log(req.facts)
+	console.log(req.facts._id)
   	res.render('index', {locals:
     	{
 			title: 'Admin',
 			doc: req.facts,
 			content: _.keys(Article.tree.content),
 			meta: _.keys(Article.tree.meta),
-			media: Article.tree.media,
+			//media: Article.tree.media,
 			tranny: {
 	  			"auth": 
 				{
@@ -133,6 +144,27 @@ app.get('/admin', newPerson, function(req, res){
   });
 });
 
+// USERS and SESSIONS
+app.get('/logout', function(req, res){
+	req.session.destroy;
+	res.redirect('/login')
+})
+app.post('/login', function(req, res){
+	var uid;
+	user.user(req.body.email, req.body.password)
+	req.session.uid = uid;
+	res.redirect('/logged')
+});
+app.get('/logged', function(req, res){
+	console.log(req.session.uid);
+	res.render('logged', {layout: false, locals: {
+		title: 'OMEGAWD',
+		sesh: req.session.uid
+	}})
+})
+app.get('/login', function (req, res){
+	res.render('login', {layout: false, locals:{title: 'OMEGAWD'}})
+});
 app.get('/', function(req, res){
   res.render('front', {
     title: 'Welcome'
@@ -167,6 +199,5 @@ app.get('fb/messages', function (req, res) {
   stream.pipe(fs.createWriteStream('backup_feed.txt'));
 });
 
-app.listen(80);
+app.listen(3000);
 console.log("Express server listening on port %d", app.address().port);
-user.user("johnny@dog.copm", "candy")
