@@ -33,7 +33,7 @@ app.configure(function(){
   app.set('view engine', 'jade');
   app.use(express.bodyParser());
   app.use(express.cookieParser());
-//  app.use(express.session({key: 'k33k33', secret: 'superSecret!', cookie: {maxAge: 60000 * 20}, store: new RedisStore()}));
+//	  app.use(express.session({key: 'k33k33', secret: 'superSecret!', cookie: {maxAge: 60000 * 20}, store: new RedisStore()}));
   app.use(express.methodOverride());
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
@@ -152,7 +152,7 @@ app.get('/logout', function(req, res){
 app.post('/login', function(req, res){
 	var uid;
 	user.user(req.body.email, req.body.password)
-	req.session.uid = uid;
+//	req.session.uid = uid;
 	res.redirect('/logged')
 });
 app.get('/logged', function(req, res){
