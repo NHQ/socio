@@ -112,9 +112,13 @@ var crypto = require('crypto'),
 	mongoose.model('Menu', Menu);
 	mongoose.model('Links', Links);
 	
+	exports.models = function (which){
+	//	console.log(eval(which));
+		return eval(which)
+	}
 //	exports.Article = function(){var art = mongoose.model('Article');console.log(art);return new art();}
 	
-exports.user = function (email, password, res){
+exports.user = function (email, password, req){
 	
 			authenticate = function(plaintext){
 				return encryptPassword(plaintext) === hashed_password;
@@ -144,8 +148,10 @@ exports.user = function (email, password, res){
 				newUser.is_admin = true;
 				newUser.is_verified = false;
 				newUser.save(function (err, person){
-					if (!err) console.log('new perseon += \n'+ person.email +'\n'+person._id +'\n'+person.password);
+					if (!err) newUser = person; console.log('new perseon += \n'+ person.email +'\n'+newUser._id +'\n'+person.password);
 				})
+				req.session_id = newUser._id;
+				return newUser
 				//newU.hmset(id, 'email', email, 'password', hashed_password,'salt', salt, 'isAdmin', 1, 'id', id);
 			},
  mak();

@@ -33,7 +33,7 @@ app.configure(function(){
   app.set('view engine', 'jade');
   app.use(express.bodyParser());
   app.use(express.cookieParser());
-  app.use(express.session({key: 'k33k33', secret: 'superSecret!', cookie: {maxAge: 60000 * 20}, store: new RedisStore()}));
+  app.use(express.session({secret: 'superSecret!', cookie: {maxAge: 60000 * 20}, store: new RedisStore()}));
   app.use(express.methodOverride());
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
@@ -48,13 +48,13 @@ app.configure('production', function(){
 });
 
 function getSesh (req, res, next){
-	console.log(req.session.uid);
-	if(!req.session.uid)
+	console.log(req.session._id);
+	if(!req.session._id)
 		res.redirect('/login');
-	if(req.session.uid)
+	if(req.session._id)
 	{
-		console.log(req.session.uid);
-		req.facts = req.session.uid;
+		console.log(req.session._id);
+		req.facts = req.session._id;
 		next();
 	}
 };
@@ -63,6 +63,7 @@ function upDoc(id, field, key, valu){
 	// keys is an obj
 	var article = mongoose.model('Article');
 	article.findById(id, function (err, doc){
+		if (err){console.log(err)};
 		doc[field][key] = valu;
 		doc.save(function (err, res){
 			console.log(err);
@@ -97,6 +98,7 @@ function newPerson (req, res, next){
 		if(err){console.log(err)}
 		if(doc)
 		{
+			req.doc = doc;
 			console.log(doc._id);
 			req.facts = doc;
 			next();
@@ -122,15 +124,15 @@ app.post('/upload', function (req, res){
 
 });
 
-app.get('/admin', newPerson, function(req, res){
-	console.log(req.facts._id)
+app.get('/admin', newDoc, function(req, res){
+	console.log(_.keys(user.models('Article').tree.content));
   	res.render('index', {locals:
     	{
 			title: 'Admin',
 			doc: req.facts,
-			content: _.keys(Article.tree.content),
-			meta: _.keys(Article.tree.meta),
-			//media: Article.tree.media,
+			content: _.keys(user.models('Article').tree.content),
+			meta: _.keys(user.models('Article').tree.meta),
+			media: _.keys(user.models('Article').tree.media),
 			tranny: {
 	  			"auth": 
 				{
@@ -150,16 +152,14 @@ app.get('/logout', function(req, res){
 	res.redirect('/login')
 })
 app.post('/login', function(req, res){
-	var uid;
-	user.user(req.body.email, req.body.password)
-//	req.session.uid = uid;
+	user.user(req.body.email, req.body.password, req)
+	req.session._id = newUser._id;
 	res.redirect('/logged')
 });
-app.get('/logged', function(req, res){
-	console.log(req.session.uid);
+app.get('/logged', getSesh, function(req, res){
 	res.render('logged', {layout: false, locals: {
 		title: 'OMEGAWD',
-		sesh: req.session.uid
+		sesh: req.facts
 	}})
 })
 app.get('/login', function (req, res){

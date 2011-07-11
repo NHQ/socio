@@ -6,10 +6,12 @@ var Article = {
 
 $(document).ready(function(){
 var classes = ['content', 'meta', 'media'];
-  $('#MyForm').transloadit({
+  /*
+	$('#MyForm').transloadit({
       wait: false,
       fields: true
   });
+*/
   $('.picker').live('click', function (e){
     var select = $(this).attr('data-filter');
     _.each(classes, function(index){if(index != select)$('.'+index).hide()});
