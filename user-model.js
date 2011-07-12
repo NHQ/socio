@@ -16,25 +16,33 @@ var crypto = require('crypto'),
 		link: [Links]
 	})
 	var Person = new Schema({
-		email: String,
-		fname: String,
-		mname: String,
-		lname: String,
-		gender: String,
-		age: Number,
-		location: String,
-		articles: [Article],
-		fb_id: String,
-		access_token: String,
-		bio: String,
-		salt: String,
-		password: String,
-		connections: {fb: Array, tw: Array, Lk: Array},
-		portrait: String,
-		comments: [Article],
-		blurbi: Array,
-		blurbo: Array,
-		projects: [Article] 
+		facts: {
+			email: String,
+			fname: String,
+			mname: String,
+			lname: String,
+			gender: String,
+			age: Number,
+			location: String,
+			articles: [Article],
+			bio: String,
+			portrait: String,
+			comments: [Article]
+		},
+		secrets: {
+			fb_id: String,
+			access_token: String,
+			salt: String,
+			password: String,
+			connections: {fb: Array, tw: Array, Lk: Array},
+			is_verified: Boolean,
+			is_admin: Boolean
+		},
+		resume:{
+			blurbi: Array,
+			blurbo: Array,
+			projects: [Article]
+		}
 	});
 	var Media = new Schema({
 		content:
@@ -142,11 +150,11 @@ exports.user = function (email, password, req){
 				doit(password);
 				var person = mongoose.model('Person');
 				newUser = new person;
-				newUser.email = email;
-				newUser.password = hashed_password;
-				newUser.salt = salt;
-				newUser.is_admin = true;
-				newUser.is_verified = false;
+				newUser.facts.email = email;
+				newUser.secrets.password = hashed_password;
+				newUser.secrets.salt = salt;
+				newUser.secrets.is_admin = true;
+				newUser.secrets.is_verified = false;
 				newUser.save(function (err, person){
 					if (!err) newUser = person; console.log('new perseon += \n'+ person.email +'\n'+newUser._id +'\n'+person.password);
 				})
