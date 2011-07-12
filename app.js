@@ -48,16 +48,33 @@ app.configure('production', function(){
 });
 
 function getSesh (req, res, next){
-	console.log(req.session._id);
 	if(!req.session._id)
 		res.redirect('/login');
 	if(req.session._id)
 	{
-		console.log(req.session._id);
-		req.facts = req.session._id;
-		next();
-	}
+		var person = mongoose.model('Person');
+		person.findById(req.session._id, function (err, individual){
+			if (err){console.log(err)}
+			req.session.regenerate(function(err){
+				req.session._id = individual._id;
+				email = individual.facts.email;
+				req.facts = req.session._id;
+				req.person = individual.secrets;
+				console.log(individual.facts.email);
+				next()
+			})
+		})}
 };
+
+function getUser(_id){
+	var person = mongoose.model('Person');
+	person.findById(_id, function (err, individual){
+		if (err){console.log(err)}
+		var dude = individual;
+		console.log(dude._id);
+		return dude
+	})
+}
 
 function upDoc(id, field, key, valu){
 	// keys is an obj
@@ -124,7 +141,15 @@ app.post('/upload', function (req, res){
 
 });
 
-app.get('/admin', newDoc, function(req, res){
+app.get('/profile', getSesh, function(req, res){
+	res.render('profile', {locals:{
+			title: 'Admin',
+			doc: req.facts,
+			facts: _.keys(user.models('Person').tree.facts),
+	}})
+})
+
+app.get('/new', getSesh, newDoc, function(req, res){
 	console.log(_.keys(user.models('Article').tree.content));
   	res.render('index', {locals:
     	{

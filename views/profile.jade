@@ -1,0 +1,18 @@
+h1.editable= title
+div(id="document", data-filter=doc._id)
+ul.menu
+  li.subMenu 
+    h2(class="picker", data-filter="content") Profile
+    - for (aught in facts)
+      ul.content
+        li(class="content")
+        h4(class="subMenuItem", data-filter=facts[aught])=facts[aught]
+
+.Profile
+  - for (aught in facts)
+    div(class='entry '+facts[aught])
+      .label
+        h3=facts[aught]
+      textarea(id=facts[aught], data-class="facts", class="editable", name=facts[aught])
+ 
+script(type='text/javascript', src='js/omegawd.js')
