@@ -53,14 +53,15 @@ function getSesh (req, res, next){
 	if(req.session._id)
 	{
 		var person = mongoose.model('Person');
-		person.findById(req.session._id, function (err, individual){
+		person.findById(req.session._id, function (err, smock){
+			var individual = smock["facts"];
+			//var rere = JSON.parse(individual);
+			console.log(smock.doc.facts.email);
 			if (err){console.log(err)}
 			req.session.regenerate(function(err){
 				req.session._id = individual._id;
-				email = individual.facts.email;
 				req.facts = req.session._id;
-				req.person = individual.secrets;
-				console.log(individual.facts.email);
+				req.person = individual;
 				next()
 			})
 		})}
@@ -145,7 +146,7 @@ app.get('/profile', getSesh, function(req, res){
 	res.render('profile', {locals:{
 			title: 'Admin',
 			doc: req.facts,
-			facts: _.keys(user.models('Person').tree.facts),
+			facts: _.keys(req.person.facts),
 	}})
 })
 
