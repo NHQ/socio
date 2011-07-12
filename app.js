@@ -53,14 +53,12 @@ function getSesh (req, res, next){
 	if(req.session._id)
 	{
 		var person = mongoose.model('Person');
-		person.findById(req.session._id, function (err, smock){
-			var individual = smock["facts"];
-			//var rere = JSON.parse(individual);
-			console.log(smock.doc.facts.email);
+		person.findById(req.session._id, function (err, individual){
 			if (err){console.log(err)}
 			req.session.regenerate(function(err){
+				console.log(individual.doc.facts);
 				req.session._id = individual._id;
-				req.facts = req.session._id;
+				req.facts = individual.doc.facts
 				req.person = individual;
 				next()
 			})
@@ -104,7 +102,7 @@ function newDoc (req, res, next){
 		if(doc)
 		{
 			console.log(doc._id);
-			req.facts = doc;
+			req.doc = doc;
 			next();
 		}
 	})
@@ -145,8 +143,7 @@ app.post('/upload', function (req, res){
 app.get('/profile', getSesh, function(req, res){
 	res.render('profile', {locals:{
 			title: 'Admin',
-			doc: req.facts,
-			facts: _.keys(req.person.facts),
+			facts: req.facts,
 	}})
 })
 
@@ -155,7 +152,7 @@ app.get('/new', getSesh, newDoc, function(req, res){
   	res.render('index', {locals:
     	{
 			title: 'Admin',
-			doc: req.facts,
+			doc: req.doc,
 			content: _.keys(user.models('Article').tree.content),
 			meta: _.keys(user.models('Article').tree.meta),
 			media: _.keys(user.models('Article').tree.media),
@@ -185,7 +182,7 @@ app.post('/login', function(req, res){
 app.get('/logged', getSesh, function(req, res){
 	res.render('logged', {layout: false, locals: {
 		title: 'OMEGAWD',
-		sesh: req.facts
+		sesh: req.session._id
 	}})
 })
 app.get('/login', function (req, res){
