@@ -15,19 +15,17 @@ var crypto = require('crypto'),
 		media: {_id: String, elements: Array}, //each array item is an element object
 		link: [Links]
 	})
-	var Person = new Schema({
+	var Project = new Schema({
 		facts: {
-			email: String,
-			fname: String,
-			mname: String,
-			lname: String,
-			gender: String,
-			age: Number,
-			location: String,
-			articles: [Article],
-			bio: String,
+			owners: Array, 
 			portrait: String,
-			comments: [Article]
+			email: String,
+			title: String,
+			location: String,
+			geo: {type: Array, index: {loc: "2d"}},
+			complete: Boolean,
+			completed_date: Date,
+			frontis: String, 
 		},
 		secrets: {
 			fb_id: String,
@@ -38,12 +36,53 @@ var crypto = require('crypto'),
 			is_verified: Boolean,
 			is_admin: Boolean
 		},
-		resume:{
+		dossier:{
+			bio: String,
 			blurbi: Array,
 			blurbo: Array,
-			projects: [Article]
+			collabs: Array,
+			portfolio: Array
 		}
 	});
+	var Blurb = new Schema({
+		owner: String,
+		quote: String,
+		date: Date,
+		ref: String
+	});
+	var Person = new Schema({
+		facts: {
+			email: String,
+			fname: String,
+			mname: String,
+			lname: String,
+			gender: String,
+			age: Number,
+			location: String,
+			geo: {type: Array, index: {loc: "2d"}},
+			portrait: {pic: String, icon: String},
+			frontis: String,
+		},
+		secrets: {
+			fb_id: String,
+			access_token: String,
+			salt: String,
+			password: String,
+			connections: {fb: Array, tw: Array, Lk: Array},
+			is_verified: Boolean,
+			is_admin: Boolean
+		},
+		dossier:{
+			bio: String,
+			blurbi: Array,
+			blurbo: Array,
+			projects: Array,
+			portfolio: Array,
+			articles: Array,
+			comments: Array,
+		}
+	});
+	
 	var Media = new Schema({
 		content:
 		{
@@ -112,14 +151,21 @@ var crypto = require('crypto'),
 		},
 		discussion: [Discussion],
 	});
-
+	mongoose.model('Blurb', Blurb);
 	mongoose.model('Article', Article);
 	mongoose.model('Discussion', Discussion);
 	mongoose.model('Media', Media);
 	mongoose.model('Person', Person);
 	mongoose.model('Menu', Menu);
 	mongoose.model('Links', Links);
-	
+	exports.save2user = function (_id, doc){
+		var lookup = mongoose.model('Person');
+		lookup.findById(_id, function(err, person){
+			person.doc.dossier.articles.push(doc);
+			console.log(person.doc.dossier.articles);
+			person.save(function(err){if(!err)console.log('sucksess!')})
+		});
+	}
 	exports.models = function (which){
 	//	console.log(eval(which));
 		return eval(which)
