@@ -20,7 +20,6 @@ var _ = require('underscore')
 	, MemoryStore = require('connect').session.MemoryStore 
 	,  crypto = require('crypto')
 	, RedisStore = require('connect-redis')(express)
-	,  mongoStore = require('connect-mongodb')
     , fb = require('facebook-js');
 
 var app = module.exports = express.createServer();

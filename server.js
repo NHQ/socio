@@ -20,7 +20,6 @@ var _ = require('underscore')
 	, MemoryStore = require('connect').session.MemoryStore 
 	,  crypto = require('crypto')
 	, RedisStore = require('connect-redis')(express)
-	,  mongoStore = require('connect-mongodb')
     , fb = require('facebook-js');
 
 var app = module.exports = express.createServer();
@@ -56,7 +55,7 @@ function getSesh (req, res, next){
 		person.findById(req.session._id, function (err, individual){
 			if (err){console.log(err)}
 			req.session.regenerate(function(err){
-				console.log(individual.doc.facts);
+				// console.log(individual.doc.facts);
 				req.session._id = individual._id;
 				req.facts = individual.doc.facts
 				req.person = individual;
@@ -66,13 +65,12 @@ function getSesh (req, res, next){
 };
 
 function getUser(_id){
-	var person = mongoose.model('Person');
+	var person = mongoose.model('Person'), dude;
 	person.findById(_id, function (err, individual){
 		if (err){console.log(err)}
-		var dude = individual;
-		console.log(dude._id);
-		return dude
-	})
+		dude = individual;
+		console.log(dude);
+	});
 }
 
 function upDoc(id, field, key, valu){
@@ -121,6 +119,37 @@ function newPerson (req, res, next){
 		}
 	})
 };
+function appendDoc(_id, string, key){
+	var nerd = mongoose.model('Person');
+	nerd.findById(_id, function (err, doc){
+		if(!err)
+		{	
+		doc.dossier[key].push(string);
+		console.log(doc.dossier[key]);
+		doc.save()
+		}
+	})
+};
+function newBlurb (req, res, next){
+	var recBy = req.session._id
+	,	recFor = req.params.person;
+	var person =  mongoose.model('Person');
+	var media =  mongoose.model('Blurb');
+	var blurb = new media();
+	var temp = blurb._id;
+	blurb.title = req.body.title || '';
+	blurb.quote = req.body.quote || '';
+	blurb.owner = recFor;
+	blurb.ref = recBy;
+	blurb.save(function(err, doc){
+		if (!err)
+		{
+			appendDoc(recFor, temp, 'blurbi');
+			appendDoc(recBy, temp, 'blurbo');
+			next();
+		}
+	})
+}
 app.post('/update', function(req,res){
 	res.writeHead('200');
 	var _id = req.query._id
@@ -139,12 +168,17 @@ app.post('/upload', function (req, res){
 	console.log(info);
 
 });
-
-app.get('/profile', getSesh, function(req, res){
-	res.render('profile', {locals:{
-			title: 'Admin',
-			facts: req.facts,
-	}})
+app.post('/profile/:person', getSesh, newBlurb, function(req, res){
+	res.redirect('/profile/'+req.params.person)
+})
+app.get('/profile/:person', getSesh, function(req, res){
+	var person = mongoose.model('Person');
+	console.log(req.params.person)
+	person.findById(req.params.person, function (err, individual){
+		if (err){console.log(err)}
+		res.render('front', {locals:{title: 'sociaGraph', person:individual.facts, stuff:individual.dossier}})
+		//console.log(individual.dossier.projects)
+	});
 })
 
 app.get('/new', getSesh, newDoc, function(req, res){
@@ -175,7 +209,7 @@ app.get('/logout', function(req, res){
 	res.redirect('/login')
 })
 app.post('/login', function(req, res){
-	user.user(req.body.email, req.body.password, req)
+	user.user(req.body.email, req.body.password, req);
 	req.session._id = newUser._id;
 	res.redirect('/logged')
 });

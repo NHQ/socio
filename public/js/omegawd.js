@@ -13,9 +13,8 @@ var classes = ['content', 'meta', 'media'];
   });
 */
   $('.picker').live('click', function (e){
-    var select = $(this).attr('data-filter');
-    _.each(classes, function(index){if(index != select)$('.'+index).hide()});
-    $('.'+select).toggle();})
+    var select = $(this);
+    $(this).children().slideToggle(200);})
   $('.subMenuItem').live('click', function(e){
 	 var select = $(this).attr('data-filter');
 	$('.'+select).toggle();})
