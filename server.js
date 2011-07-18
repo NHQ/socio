@@ -292,13 +292,13 @@ app.get('/fb', function (req, res) {
   }));
 });
 
-app.get('fb/auth', function (req, res) {
+app.get('/fb/auth', function (req, res) {
   fb.getAccessToken('230413970320943', 'appSecret', req.param('code'), 'http://mostmodernist.no.de:3000/fb/auth', function (error, access_token, refresh_token) {
     res.render('client', {access_token: access_token, refresh_token: refresh_token});
   });
 });
 
-app.post('fb/message', function (req, res) {
+app.post('/fb/message', function (req, res) {
   fb.apiCall('POST', '/me/feed',
     {access_token: req.param('access_token'), message: req.param('message')},
     function (error, response, body) {
