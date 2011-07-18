@@ -288,7 +288,7 @@ app.get('/fb', function (req, res) {
   res.redirect(fb.getAuthorizeUrl({
     client_id: '230413970320943',
     redirect_uri: 'http://mostmodernist.no.de:3000/fb/auth',
-    scope: 'offline_access,publish_stream'
+    scope: 'offline_access,user_location,friends_likes,friends_events,user_photos,publish_stream'
   }));
 });
 
@@ -299,7 +299,7 @@ app.get('/fb/auth', function (req, res) {
 });
 
 app.post('/fb/message', function (req, res) {
-  fb.apiCall('POST', '/me/feed',
+  fb.apiCall('GET', '/me',
     {access_token: req.param('access_token'), message: req.param('message')},
     function (error, response, body) {
       res.render('done', {body: body});
