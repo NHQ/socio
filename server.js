@@ -1,8 +1,4 @@
 /**
- * NOTES
-	* Possible idea for other Sabina website: property picks a la blog
-*/
-/**
  * Module dependencies.
  */
 
@@ -20,7 +16,9 @@ var _ = require('underscore')
 	, MemoryStore = require('connect').session.MemoryStore 
 	,  crypto = require('crypto')
 	, RedisStore = require('connect-redis')(express)
-    , fb = require('facebook-js');
+    , fb = require('facebook-js')
+	, formidable = require('formidable')
+	, sys = require('sys');
 
 var app = module.exports = express.createServer();
 
@@ -32,7 +30,7 @@ app.configure(function(){
   app.set('view engine', 'jade');
   app.use(express.bodyParser());
   app.use(express.cookieParser());
-  app.use(express.session({secret: 'superSecret!', cookie: {maxAge: 60000 * 20}, store: new RedisStore()}));
+  app.use(express.session({secret: 'superSecret!', cookie: {maxAge: 60000 * 2000}, store: new RedisStore()}));
   app.use(express.methodOverride());
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
@@ -64,9 +62,9 @@ function getSesh (req, res, next){
 		})}
 };
 
-function getUser(_id){
+function getUser(req, res, next){
 	var person = mongoose.model('Person'), dude;
-	person.findById(_id, function (err, individual){
+	person.findById(req.session._id, function (err, individual){
 		if (err){console.log(err)}
 		dude = individual;
 		console.log(dude);
@@ -75,7 +73,7 @@ function getUser(_id){
 
 function upDoc(id, field, key, valu){
 	// keys is an obj
-	var article = mongoose.model('Article');
+	var article = mongoose.model('Person');
 	article.findById(id, function (err, doc){
 		if (err){console.log(err)};
 		doc[field][key] = valu;
@@ -84,7 +82,33 @@ function upDoc(id, field, key, valu){
 			console.log(res)	
 		});
 	})
+};
+function getBlurbs(req, res, next){
+	req.blurbs = [];
+	var blurbi = mongoose.model('Blurb');
+	var y = req.person.dossier.blurbi.length;
+	for (x = 0; x < req.person.dossier.blurbi.length; x++)
+		if (x === req.person.dossier.blurbi.length){next()};
+		blurbi.findById(a, function (err, doc){
+			if(!err){
+				req.blurbs.push(doc)
+			}
+		})
+};
+function picload(id, valu){
+	// keys is an obj
+	var article = mongoose.model('Person');
+	article.findById(id, function (err, doc){
+		if (err){console.log(err)};
+		doc.facts.portrait.pic = valu;
+		doc.save(function (err, res){
+			console.log(err);
+			console.log(res)	
+		});
+	})
 }
+
+
 function newMedia (doc_type, info){
 	var media = mongoose.model('Media');
 	var doc = new Media();
@@ -150,6 +174,20 @@ function newBlurb (req, res, next){
 		}
 	})
 }
+
+app.post('/picload', function(req, res){
+	var form = new formidable.IncomingForm();
+	form.uploadDir = 'public/images';
+	form.keepExtensions = true;
+	form.parse(req, function(err, fields, files){
+		res.writeHead(200, {'content-type': 'text/plain'});
+		var place = files.my_file.path.slice(files.my_file.path.indexOf("/"));
+		picload(req.session._id, place);
+		console.log(place);
+		      res.write('received upload:\n\n');
+		      res.end(sys.inspect({fields: fields, files: files}));
+	})
+})
 app.post('/update', function(req,res){
 	res.writeHead('200');
 	var _id = req.query._id
@@ -176,20 +214,38 @@ app.get('/profile/:person', getSesh, function(req, res){
 	console.log(req.params.person)
 	person.findById(req.params.person, function (err, individual){
 		if (err){console.log(err)}
-		res.render('front', {locals:{title: 'sociaGraph', person:individual.facts, stuff:individual.dossier}})
+		res.render('front', {locals:{session: true, title: 'sociaGraph', person:individual.facts, stuff:individual.dossier}})
 		//console.log(individual.dossier.projects)
 	});
 })
-
-app.get('/new', getSesh, newDoc, function(req, res){
-	console.log(_.keys(user.models('Article').tree.content));
+app.get('/edit-blurbs', getSesh, getBlurbs, function(req, res){
+	console.log(req.blurbs);
+  	res.render('edit', {locals:
+    	{
+			session: true,
+			title: 'Admin',
+			person: req.person,
+			stuff:req.person.dossier,
+			tranny: {
+	  			"auth": 
+				{
+	    			"key": "b2841a053d384302bf39b2ab4dbc88ec"
+	  			},
+	  			"template_id": "6f8d596087084fc18cfaa9924801e17c",
+	  			"redirect_url": "http://72.2.117.15/admin",
+				"notify_url": "http://72.2.117.15/upload"
+			}
+		}
+  });	
+})
+app.get('/edit-me', getSesh, function(req, res){
+	console.log(req.person);
   	res.render('index', {locals:
     	{
+			session: true,
 			title: 'Admin',
-			doc: req.doc,
-			content: _.keys(user.models('Article').tree.content),
-			meta: _.keys(user.models('Article').tree.meta),
-			media: _.keys(user.models('Article').tree.media),
+			person: req.person,
+			content: _.keys(user.models('Person').tree.facts),
 			tranny: {
 	  			"auth": 
 				{

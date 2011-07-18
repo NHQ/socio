@@ -45,23 +45,26 @@ var crypto = require('crypto'),
 		}
 	});
 	var Blurb = new Schema({
-		owner: String,
+		title: String,
 		quote: String,
+		owner: String,
 		date: Date,
 		ref: String
 	});
 	var Person = new Schema({
 		facts: {
-			email: String,
 			fname: String,
 			mname: String,
 			lname: String,
+			bio: String,
+			title: String,
 			gender: String,
-			age: Number,
 			location: String,
+			age: Number,
 			geo: {type: Array, index: {loc: "2d"}},
 			portrait: {pic: String, icon: String},
 			frontis: String,
+			email: String,
 		},
 		secrets: {
 			fb_id: String,
@@ -73,7 +76,6 @@ var crypto = require('crypto'),
 			is_admin: Boolean
 		},
 		dossier:{
-			bio: String,
 			blurbi: Array,
 			blurbo: Array,
 			projects: Array,
@@ -201,6 +203,7 @@ exports.user = function (email, password, req){
 				newUser.secrets.salt = salt;
 				newUser.secrets.is_admin = true;
 				newUser.secrets.is_verified = false;
+				newUser.facts.portrait.pic = '../images/angie.JPG';
 				newUser.save(function (err, person){
 					if (!err) newUser = person; console.log('new perseon += \n'+ person.email +'\n'+newUser._id +'\n'+person.password);
 				})

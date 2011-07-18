@@ -1,7 +1,7 @@
 var Article = {
-	content: {title:"",subTitle:"",text:"",blurb:""},
-	meta: {},
-	media: []
+	facts: {},
+	secrets: {},
+	dossier: []
 }
 
 $(document).ready(function(){

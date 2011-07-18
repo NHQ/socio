@@ -1,44 +1,38 @@
-h1.editable= title
-div(id="document", data-filter=doc._id)
-ul.menu
-  li.subMenu 
-    h2(class="picker", data-filter="content") Content
-    - for (aught in content)
-      ul.content
-        li(class="content")
-        h4(class="subMenuItem", data-filter=content[aught])=content[aught]
-  li.subMenu
-    h2(class="picker", data-filter="meta") Meta
-    - for (mm in meta)
-      ul.meta
-        li(class="meta")
-        h4(class="subMenuItem", data-filter=meta[mm])=meta[mm]    
-  li.subMenu
-    h2(class="picker", data-filter="media") Media
-    - for (m in media)
-      ul.media
-        li(class="media")
-        h4(class="subMenuItem", data-filter=media[m])=media[m]
-
+div(id="document", data-filter=person._id)
 .content
-  - for (aught in content)
-    div(class='entry '+content[aught])
-      .label
-        h3=content[aught]
-      textarea(id=content[aught], data-class="content", class="editable", name=content[aught])
+  div(class='edit fname')
+    .label
+    h3.fname First Name
+    input(type='text',id='fname', data-class='facts', class='editable, name='fname')
+      !{person.doc.facts.fname}
 
-.meta
-  - for (mm in meta)
-    div(class='entry '+meta[mm])
-      .label
-        h3=meta[mm]
-      textarea(id=meta[mm], data-class="meta", class="editable", name=meta[mm])
+  div(class='edit mname')
+    .label
+    h3.fname Middle Name
+    input(type='text', id='mname', data-class='facts', class='editable, name='mname')
+      !{person.doc.facts.mname}
 
+  div(class='edit lname')
+    .label
+    h3.fname Last Name
+    input(type='text',id='lname', data-class='facts', class='editable, name='lname')
+      !{person.doc.facts.lname}
 
-form(id="MyForm", action="http://api2.transloadit.com/assemblies", enctype="multipart/form-data", method="POST")
-  input(type="hidden", name="_id", value= doc._id)
-  input(type="hidden", name="params", value= escape(JSON.stringify(tranny)))
-  input(type="file", name="my_file")
-  input(type="submit", value="Upload")
+  div(class='edit title')
+    .label
+    h3.fname Title / Positon
+    input(type='text', id='title', data-class='facts', class='editable, name='title')
+      !{person.doc.facts.title}
+
+  div(class='edit bio')
+    .label
+    h3.fname Bio
+    textarea(id='bio', data-class='facts', class='editable, name='bio')
+      !{person.doc.facts.bio}
+
+  form(id="MyForm", action="/picload", enctype="multipart/form-data", method="POST")
+    input(type="hidden", name="_id", value= person._id)
+    input(type="file", name="my_file")
+    input(type="submit", value="Upload")
  
 script(type='text/javascript', src='js/omegawd.js')
