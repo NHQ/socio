@@ -287,7 +287,7 @@ app.get('/', function(req, res){
 app.get('/fb', function (req, res) {
   res.redirect(fb.getAuthorizeUrl({
     client_id: '230413970320943',
-    redirect_uri: 'http://mostmodernis	t.no.de:3000/fb/auth',
+    redirect_uri: 'http://mostmodernist.no.de:3000/fb/auth',
     scope: 'offline_access,publish_stream'
   }));
 });
