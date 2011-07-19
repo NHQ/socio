@@ -296,7 +296,10 @@ app.get('/fb/auth', function (req, res) {
   fb.getAccessToken('230413970320943', '8de03128b6dab8fa0fd18c560100594e', req.param('code'), 'http://mostmodernist.no.de:3000/fb/auth', function (error, access_token, refresh_token) {
 	fb.apiCall('GET', '/me', {access_token: access_token, fields:'id,gender,name,location,locale,friends'}, function (err, response, body){
 		var person = mongoose.model('Person');
-		person.update({'secrets.fb_id':  body.id}, {upsert:true});	
+		person.update({'secrets.fb_id':  body.id}, {upsert:true}, function (err, doc){
+			if(!err)
+			console.log('succss \n'+doc)
+		});	
 		})
   });
 });
