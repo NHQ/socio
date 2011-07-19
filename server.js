@@ -294,7 +294,9 @@ app.get('/fb', function (req, res) {
 
 app.get('/fb/auth', function (req, res) {
   fb.getAccessToken('230413970320943', 'appSecret', req.param('code'), 'http://mostmodernist.no.de:3000/fb/auth', function (error, access_token, refresh_token) {
-    res.render('client', {access_token: access_token, refresh_token: refresh_token});
+    fb.apiCall('GET', '/me', {access_token: access_token, fields:id,gender,name,location,locale,friends}, function (err, response, body){
+	console.log(body);	
+	})
   });
 });
 
