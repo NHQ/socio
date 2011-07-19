@@ -293,8 +293,9 @@ app.get('/fb', function (req, res) {
 });
 
 app.get('/fb/auth', function (req, res) {
-  fb.getAccessToken('230413970320943', 'appSecret', req.param('code'), 'http://mostmodernist.no.de:3000/fb/auth', function (error, access_token, refresh_token) {
-   console.log(access_token)
+  fb.getAccessToken('230413970320943', '8de03128b6dab8fa0fd18c560100594e', req.param('code'), 'http://mostmodernist.no.de:3000/fb/auth', function (error, access_token, refresh_token) {
+console.log(error);   
+console.log(access_token)
   });
 });
 
