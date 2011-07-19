@@ -298,7 +298,7 @@ app.get('/fb/auth', function (req, res) {
 		var person = mongoose.model('Person');
 		person.update({'secrets.fb_id':  body.id}, {upsert:true}, function (err, doc){
 			if(!err)
-			console.log('succss \n'+doc)
+			console.log('succss \n'+doc._id)
 		});	
 		})
   });
