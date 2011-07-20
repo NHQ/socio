@@ -287,20 +287,25 @@ app.get('/', function(req, res){
 app.get('/fb', function (req, res) {
   res.redirect(fb.getAuthorizeUrl({
     client_id: '230413970320943',
-    redirect_uri: 'http://mostmodernist.no.de:3000/fb/auth',
+    redirect_uri: 'http://74.207.246.247:3001/fb/auth',
     scope: 'offline_access,user_location,friends_likes,friends_events,user_photos,publish_stream'
   }));
 });
 
 app.get('/fb/auth', function (req, res) {
-  fb.getAccessToken('230413970320943', '8de03128b6dab8fa0fd18c560100594e', req.param('code'), 'http://mostmodernist.no.de:3000/fb/auth', function (error, access_token, refresh_token) {
+  fb.getAccessToken('230413970320943', '8de03128b6dab8fa0fd18c560100594e', req.param('code'), 'http://74.207.246.247:3001/fb/auth', function (error, access_token, refresh_token) {
 	fb.apiCall('GET', '/me', {access_token: access_token, fields:'id,gender,name,location,locale,friends'}, function (err, response, body){
-		var person = mongoose.model('Person');
-		person.update({'secrets.fb_id':  body.id}, {upsert:true}, function (err, doc){
-			if(!err)
-			console.log('succss \n'+JSON.stringify(doc))
-		});	
-		})
+		console.log(body);
+    var person = mongoose.model('Person');
+    person.find({'secrets.fb_id': '00001251ddfkfk'}, function(err, bod){
+        console.log(err);
+        console.log(bod);
+    });
+		//person.update({'secrets.fb_id':  body.id}, {upsert:true}, function (err, doc){
+			//if(!err)
+			//console.log('succss \n'+_.keys(doc))
+		//});	
+	})
   });
 });
 
@@ -318,5 +323,5 @@ app.get('fb/messages', function (req, res) {
   stream.pipe(fs.createWriteStream('backup_feed.txt'));
 });
 
-app.listen(3000);
+app.listen(3001);
 console.log("Express server listening on port %d", app.address().port);
