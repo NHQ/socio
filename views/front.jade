@@ -16,8 +16,8 @@
         a(href='#edit') edit this page
 div#console
   div#menu
-    img#subject(src=person.portrait.pic, width='350px', height="200px")
-    =person.facts.email
+    img#subject(src='../../'+person.facts.portrait)
+    =person.facts.fname+' '+person.facts.lname
     div#menu 
       ul.picker Testimonials
       ul.picker Profile
@@ -26,21 +26,21 @@ div#console
         li#learning Learning
         li#contact Contact
       ul.picker Projects
-        - if (stuff.projects.length)
+        - if (stuff.projects)
           -each p in stuff.projects
             li(id=p)= p
       ul.picker Portfolio
-        - if (stuff.articles.length)
+        - if (stuff.articles)
           -each a in stuff.articles
             li(id=a)= a
   div#content  
-    - if (stuff.blurbi.length)
-      -each a in stuff.blurbi
-        li= a
+    - if (blurbs.length)
+      - each a in blurbs
+        li= a.title
 
-form#recommend(action='../profile/' + person._id, method='post')
+form#recommend(action='/profile/id/' + person._id, method='post')
   input(type='text', name='title', value='optional title')
   textarea(name='quote') text goes here
   input(type='submit', value='submit')
   
-script(type='text/javascript', src='../js/omegawd.js')
+script(type='text/javascript', src='../../js/omegawd.js')

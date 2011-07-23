@@ -58,20 +58,23 @@ var crypto = require('crypto'),
 			lname: String,
 			bio: String,
 			title: String,
+      position: String,
 			gender: String,
 			location: String,
-			age: Number,
+			age: String,
 			geo: {type: Array, index: {loc: "2d"}},
-			portrait: {pic: String, icon: String},
+			portrait: {type: String, default: '../images/7e317792beade4a3f55119027d46ed56.gif'},
 			frontis: String,
 			email: String,
+      contact: String,
+      website: String
 		},
 		secrets: {
-			fb_id: String,
-			access_token: String,
+			fb_id: {type: String, index: true},
+			fb_access_token: String,
 			salt: String,
 			password: String,
-			connections: {fb: Array, tw: Array, Lk: Array},
+			fbx: Array,
 			is_verified: Boolean,
 			is_admin: Boolean
 		},
@@ -81,7 +84,7 @@ var crypto = require('crypto'),
 			projects: Array,
 			portfolio: Array,
 			articles: Array,
-			comments: Array,
+			comments: Array
 		}
 	});
 	
@@ -94,7 +97,7 @@ var crypto = require('crypto'),
 			caption: String,
 			path: String, 
 			thumb: String, 
-			medium: String,
+			medium: String
 		},
 		meta:
 		{
@@ -107,9 +110,9 @@ var crypto = require('crypto'),
 		style:
 		{
 			template: String,
-			theme: String,
+			theme: String
 			//css:[CSS]
-		},
+		}
 	});
 
 	var Discussion = new Schema({
@@ -127,7 +130,7 @@ var crypto = require('crypto'),
 			title: String,
 			subTitle: String,
 			blurb: String,
-			text: String,		
+			text: String
 		},
 		media: Array,
 		meta:
@@ -143,15 +146,15 @@ var crypto = require('crypto'),
 			slug: String,
 			channels: Array,
 			subjects: Array,
-			contact: String,
+			contact: String
 		},
 		style:
 		{
 			template: String,
-			theme: String,
+			theme: String
 			//css:[CSS]
 		},
-		discussion: [Discussion],
+		discussion: [Discussion]
 	});
 	mongoose.model('Blurb', Blurb);
 	mongoose.model('Article', Article);
