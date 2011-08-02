@@ -5,6 +5,15 @@ var Article = {
 }
 
 $(document).ready(function(){
+  /*$( "#sortable" ).sortable({
+    update: function(event, ui) { 
+      var data = encodeURIComponent(JSON.stringify($(this).sortable('toArray')));
+      console.log(data);
+      $.post('/sort-blurbs?data='+data, function(err,data){console.log(data)})
+      }  
+  });*/
+  	//$( "#sortable" ).disableSelection();
+  $('.published:checkbox').live('change', function(e){$.post('/publish-state', {id: $(this).attr('value'), published: $(this).attr('checked')})})
 var classes = ['content', 'meta', 'media'];
   /*
 	$('#MyForm').transloadit({
@@ -12,7 +21,7 @@ var classes = ['content', 'meta', 'media'];
       fields: true
   });
 */
-  $('.picker').live('click', function (e){
+  $('ul.picker').live('click', function (e){
     var select = $(this);
     $(this).children().slideToggle(200);})
   $('.subMenuItem').live('click', function(e){

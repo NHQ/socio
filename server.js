@@ -48,14 +48,14 @@ app.configure('production', function(){
 
 function getSesh (req, res, next){
 	if(!req.session._id)
-		res.redirect('/login');
+		res.redirect('/fb');
 	if(req.session._id)
 	{
-		var person = mongoose.model('Person');
-		person.findById(req.session._id, function (err, individual){
+		req.perp = mongoose.model('Person');
+		req.perp.findById(req.session._id, function (err, individual){
 			if (err){console.log(err);}
 			req.session.regenerate(function(err){
-				console.log(individual);
+				//console.log(individual);
 				req.session._id = individual._id;
 				req.facts = individual.doc.facts;
 				req.person = individual;
@@ -157,13 +157,12 @@ function appendDoc(_id, string, key){
 function newBlurb (req, res, next){
 	var recBy = req.session._id
 	,	recFor = req.params.person;
-	var person =  mongoose.model('Person');
 	var media =  mongoose.model('Blurb');
 	var blurb = new media();
 	var temp = blurb._id;
 	blurb.title = req.body.title || '';
 	blurb.quote = req.body.quote || '';
-	blurb.owner = recFor;
+	blurb.owner._id = recFor;
 	blurb.ref = recBy;
 	blurb.save(function(err, doc){
 		if (!err)
@@ -174,6 +173,7 @@ function newBlurb (req, res, next){
 		}
 	});
 }
+
 function getBlurbs(id){
   var ibid =[]; 
   step(
@@ -188,6 +188,46 @@ function getBlurbs(id){
     );
   console.log(ibid);
 }
+function sortBlurb(perp, sort){
+  var nerd = mongoose.model('Person');
+  nerd.update({_id:perp}, {'dossier.blurbi': sort}, function(err,re){
+    console.log(re);
+    res.end();
+  });
+}
+
+app.post('/publish-state', getSesh, function(req,res){
+  var blurb = mongoose.model('Blurb');
+  var bull = (req.body.published === 'true');
+  console.log(bull+'\n'+req.body.id);
+  blurb.update({_id:req.body.id}, {published:bull}, function(err,save){
+    console.log(err || save); 
+    res.end();
+  });
+});
+
+app.post('/delete-blurb', getSesh, function(req,res){
+  console.log(req.person.doc.dossier.blurbi+'\n'+req.body.id);
+  var blurbs = [];
+  blurbs = _.without(req.person.doc.dossier.blurbi, req.body.id);
+  console.log(blurbs);
+  var person = mongoose.model('Person');
+  person.update({_id:req.session._id}, {'facts.fname': 'eagle','dossier.blurbi':blurbs}, function(err,save){console.log('is saved: '+save+'\n'+err);
+    res.redirect('/stoop/'+req.session._id);
+    res.end();
+  });
+  //var blurb = mongoose.model('Blurb');
+  //blurb.remove({_id:req.body.id}, function(err,re){console.log(re)})
+});
+app.post('/sort-blurbs', getSesh, function(req,res){
+    var nerd = mongoose.model('Person');
+    console.log(req.query.data);
+    res.end();
+  nerd.update({_id:req.session._id}, {'dossier.blurbi': JSON.parse(req.query.data)}, function(err,re){
+    console.log(re);
+    res.end();
+  });
+});
 app.post('/picload', function(req, res){
 	var form = new formidable.IncomingForm();
 	form.uploadDir = 'public/person/'+req.session._id;
@@ -227,45 +267,56 @@ app.post('/upload', function (req, res){
 app.post('/profile/id/:person', getSesh, newBlurb, function(req, res){
 	res.redirect('/profile/id/'+req.params.person);
 });
-
-function stoop(perp){
-  var person = mongoose.model('Person'), blurb = mongoose.model('Blurb');
-  step(
-    function(){
-      blurb.find({ref:perp}, this);
-    },
-    function(err, blurb){
-      async.map(blurb, person.findById(blurb.owner, function(err, doc){return doc.facts}), function(err, result){console.log(reuslts)})
-    }
-  )
+function byOwner(b,cb){
+  var person = mongoose.model('Person');
+    person.findById(b.owner._id,function(err,perp){
+      b.owner.facts = perp.facts;
+      cb(null, b);
+    });
 }
-
-app.get('/profile/pid/:person', function(req, res){
-  stoop(req.params.person);
+function getBlurb(id, callback){
+  var blurb = mongoose.model('Blurb');
+  blurb.findById(id, function(err,doc){
+    callback(null, doc);
+  });
+}
+function stoop(blurbs, callback){
+  console.log(blurbs.length);
+  if (blurbs.length < 1)
+  {
+    callback(null,blurbs);  
+  }
+  if (blurbs.length > 0)
+  {
+  async.waterfall([
+    function(cb){
+      async.map(blurbs,getBlurb,function(err,res){
+        cb(null,res);
+      });
+    },
+    function(blurbs,cb){
+      console.log(blurbs);
+      async.map(blurbs,byOwner,function(err,res){
+        cb(null,res);
+      });
+    },
+    function(blurbs,cb){
+      callback(null,blurbs);
+    }
+]);}}
+app.get('/stoop/:person', getSesh, function(req,res){
+  console.log(req.person.doc.dossier.blurbi);
+  stoop(req.person.doc.dossier.blurbi, function(err, blurbs){ 
+     res.render('front', {locals:{session: true, blurbs:blurbs, title: 'sociaGraph', person:req.person.doc, stuff:req.person.doc.dossier}});
+  });
 });
 
 app.get('/profile/id/:person', function(req, res){
   var person = mongoose.model('Person'), blurb = mongoose.model('Blurb');
   console.log(req.params.person);
-  step(
-    function load(){
-      person.findById(req.params.person, this.parallel());
-      blurb.find({ref:req.params.person}, this.parallel());
-    },
-    function each(err, person, blurbs){
-      _.each(blurbs, function(b){
-        person.findById(b.owner, {facts:1}, function(err, doc){
-          b.owner = doc.facts
-        })
-      });
-    },
-    function show(err, person, blurbs){
-      if (err){console.log(err);}
-      console.log(person);
-      console.log(blurbs);
-      res.render('front', {locals:{session: true, title: 'sociaGraph', blurbs: blurbs, person:person.facts, stuff:person.dossier}});      
-    }
-  );
+  person.findById(req.params.person, function(err,person){
+    res.render('front', {locals:{session: true, blurbs: [], title: 'sociaGraph', person:person.facts, stuff:person.dossier}});
+  });  
 });
 app.get('/profile/edit-blurbs', getSesh, getBlurbs, function(req, res){
 	console.log(req.blurbs);
@@ -310,22 +361,22 @@ app.get('/profile/edit-me', getSesh, function(req, res){
 
 // USERS and SESSIONS
 app.get('/logout', function(req, res){
-	req.session.destroy;
-	res.redirect('/login')
-})
+	req.session.destroy();
+	res.redirect('/login');
+});
 app.post('/login', function(req, res){
 	user.user(req.body.email, req.body.password, req);
 	req.session._id = newUser._id;
-	res.redirect('/logged')
+	res.redirect('/logged');
 });
 app.get('/logged', getSesh, function(req, res){
 	res.render('logged', {layout: false, locals: {
 		title: 'OMEGAWD',
 		sesh: req.session._id
-	}})
-})
+	}});
+});
 app.get('/login', function (req, res){
-	res.render('login', {layout: false, locals:{title: 'OMEGAWD'}})
+	res.render('login', {layout: false, locals:{title: 'OMEGAWD'}});
 });
 app.get('/', function(req, res){
   res.render('front', {
@@ -359,7 +410,7 @@ app.get('/fb/auth', function (req, res) {
         });
         req.session._id = rez._id;
         console.log(rez._id);
-        res.redirect('/profile/edit-me');
+        res.redirect('/stoop/'+rez._id);
       });
 		});	
 	});
@@ -383,7 +434,7 @@ request.get('https://graph.facebook.com/'+req.person.doc.secrets.fb_id+'/picture
     res.write('received pic list:\n\n');
   	res.end();
   });
-})
+});
 app.get('fb/messages', function (req, res) {
   var stream = fb.apiCall('GET', '/me/feed', {access_token: req.param('access_token'), message: req.param('message')});
   stream.pipe(fs.createWriteStream('backup_feed.txt'));

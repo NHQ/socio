@@ -9,12 +9,12 @@ var crypto = require('crypto'),
 		text: String,
 		media: Array,
 		href: String
-	})
+	});
 	var Menu = new Schema({
 		title: String,
 		media: {_id: String, elements: Array}, //each array item is an element object
 		link: [Links]
-	})
+	});
 	var Project = new Schema({
 		facts: {
 			owners: Array, 
@@ -25,7 +25,7 @@ var crypto = require('crypto'),
 			geo: {type: Array, index: {loc: "2d"}},
 			complete: Boolean,
 			completed_date: Date,
-			frontis: String, 
+			frontis: String 
 		},
 		secrets: {
 			fb_id: String,
@@ -47,9 +47,10 @@ var crypto = require('crypto'),
 	var Blurb = new Schema({
 		title: String,
 		quote: String,
-		owner: String,
+		owner: {_id: String},
 		date: Date,
-		ref: String
+		ref: String,
+    published: {type: Boolean, default: false}
 	});
 	var Person = new Schema({
 		facts: {
@@ -168,13 +169,13 @@ var crypto = require('crypto'),
 		lookup.findById(_id, function(err, person){
 			person.doc.dossier.articles.push(doc);
 			console.log(person.doc.dossier.articles);
-			person.save(function(err){if(!err)console.log('sucksess!')})
+			person.save(function(err){if(!err)console.log('sucksess!');});
 		});
-	}
+	};
 	exports.models = function (which){
 	//	console.log(eval(which));
-		return eval(which)
-	}
+		return eval(which);
+	};
 //	exports.Article = function(){var art = mongoose.model('Article');console.log(art);return new art();}
 	
 exports.user = function (email, password, req){

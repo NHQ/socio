@@ -32,3 +32,5 @@ a {
 }
 
 #subject {display:block}
+#console{width:300px;float:left}
+#content{margin-left:450px}

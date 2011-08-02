@@ -33,14 +33,25 @@ div#console
         - if (stuff.articles)
           -each a in stuff.articles
             li(id=a)= a
-  div#content  
-    - if (blurbs.length)
-      - each a in blurbs
-        li= a.title
+  form#recommend(action='/profile/id/' + person._id, method='post')
+    input(type='text', name='title', value='optional title')
+    textarea(name='quote') text goes here
+    input(type='submit', value='submit')
 
-form#recommend(action='/profile/id/' + person._id, method='post')
-  input(type='text', name='title', value='optional title')
-  textarea(name='quote') text goes here
-  input(type='submit', value='submit')
+div#content  
+  - if (blurbs.length)
+  ul#sortable  
+    - each a in blurbs
+      li.ui-state-default(id=a._id)
+        div.admin
+          form(action='/delete-blurb', method='post')
+            input(type="hidden", name="id", value=a._id) 
+            input(type="checkbox", ,value=a._id, class="published", checked=a.published, id="a"+a._id, name="published")
+            <label for=!{'a'+ a._id}>Publish?</label>
+            input(type='submit', value='delete this blurb')
+        =a._id
+        br
+        =a.owner.facts.fname+' '+a.owner.facts.lname
+
   
 script(type='text/javascript', src='../../js/omegawd.js')
